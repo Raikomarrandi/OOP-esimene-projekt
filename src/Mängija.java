@@ -24,6 +24,10 @@ public class Mängija {
         this.nimi = nimi;
     }
 
+    public void setSümbol(String sümbol) {
+        this.sümbol = sümbol;
+    }
+
     public void setPunktid(int punktid) {
         this.punktid = punktid;
     }
