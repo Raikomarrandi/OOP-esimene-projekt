@@ -1,8 +1,5 @@
 import javax.swing.*;
 import java.util.Random;
-// TODO: võiks teha nii, et sa ei saa lisada sinna, kus juba on X või O pandud. Et kui üritad sinna panna siis tuleb mingi "sinna ei saa panna, vali uus koht" vms
-// TODO: praegu on viigi puhul veits jama, selle kohta peaks minig eraldi teade ja värki olema
-// TODO: praegu kui üks võidab, siis teine saab veel käia, selle peaks ära fixima
 // probs on veel mingeid probleeme, pole eriti testinud veel ja optimeerida saab ka veel korralikult ma arvan
 public class Mäng {
     String[] seis = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9"};
@@ -13,8 +10,10 @@ public class Mäng {
     public void mängi() {
         int[] tulemused = {0, 0};
 
-        String nimi1 = JOptionPane.showInputDialog(null, "Mängime mängu trips-traps-trull", "1. mängija nimi");
-        String nimi2 = JOptionPane.showInputDialog(null, "Mängime mängu trips-traps-trull", "2. mängija nimi");
+        //küsime kasutajate käest jOptionPane kasutades nimed
+        // TODO muutsin sõnumikastist "sisesta nimi" messagekasti, sest juba esimesel käivitamisel see segas mind, et kustutama pidi
+        String nimi1 = JOptionPane.showInputDialog(null, "Mängime mängu trips-traps-trull. \nSisesta 1. mängija nimi:", "");
+        String nimi2 = JOptionPane.showInputDialog(null, "Mängime mängu trips-traps-trull. \nSisesta 2. mängija nimi:", "");
 
         mängija1.setNimi(nimi1);
         mängija2.setNimi(nimi2);
@@ -26,29 +25,25 @@ public class Mäng {
 
 
         while (true) {
-            Random r = new Random();
-            int alustaja = r.nextInt(2);
+            seis = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9"};//iga tsükli alguses kirjutame seisu "tühjaks" üle
+            int alustaja = (int) ( Math.random() * 2 + 1);//valib võrdse tõenäosusega, kas alustab 1. või 2. mängija
 
+            //kui alustaja == 1, siis alustab teine mängija
             if (alustaja == 1) {
                 käik(seis, mängija2);
             }
 
+            //for-tsükkel, kus tehakse käik ja seejärel kontrollitakse, kas mäng on lõppenud
             for (int i = 0; i < 5; i++) {
+                //esimese mängija käik
                 käik(seis, mängija1);
-                if (kasKeegiVõitis(seis) == mängija1) {
-                    kuvaMängulaud(seis);
-                    System.out.println("MÄNG LÄBI!");
-                    System.out.println("Võitis" + mängija1.getNimi());
-                    break;
-                }
-                käik(seis, mängija2);
-                if (kasKeegiVõitis(seis) == mängija2) {
-                    kuvaMängulaud(seis);
-                    System.out.println("MÄNG LÄBI!");
-                    System.out.println("Võitis" + mängija2.getNimi());
-                    break;
-                }
+                if (kasKeegiVõitis(seis))
+                    break;//kui mäng on läbi, siis lõppeb tsükkel
 
+                //teise mängija käik
+                käik(seis, mängija2);
+                if (kasKeegiVõitis(seis))
+                    break;//kui mäng on läbi, siis lõppeb tsükkel
             }
 
             System.out.println("Tulemused: ");
@@ -69,8 +64,16 @@ public class Mäng {
 
     public void käik(String[] seis, Mängija mängija) {
         kuvaMängulaud(seis);
+        while (true){
         String valik = JOptionPane.showInputDialog(null, mängija.getNimi() + ", millise numbriga tähistatud ruudule soovid käia?", "");
-        seis[(Integer.parseInt(valik)) - 1] = mängija.getSümbol();
+        if (!seis[(Integer.parseInt(valik)) - 1].equals("X") && !seis[(Integer.parseInt(valik)) - 1].equals("O")) {
+            seis[(Integer.parseInt(valik)) - 1] = mängija.getSümbol();
+            break;
+        }
+        else
+            System.out.println("Sinna ruutu ei saa, proovi uuesti!");//TODO see error ka äkki JOptionPane-iga?
+
+        }
     }
 
     public void kuvaMängulaud(String[] seis) {
@@ -82,26 +85,68 @@ public class Mäng {
         System.out.println(" " + seis[6] + " | " + seis[7] + " | " + seis[8]);
     }
 
-    private Mängija kasKeegiVõitis(String[] seis) {
+    private boolean kasKeegiVõitis(String[] seis) {
         for (int i = 0; i < 3; i++) {
-            if ((seis[i].equals(seis[i + 1]) && seis[i].equals(seis[i + 2]))
-                    || (seis[i].equals(seis[i + 3]) && seis[i].equals(seis[i + 6]))
-                    || (seis[0].equals(seis[4]) && seis[0].equals(seis[8]))
-                    || (seis[2].equals(seis[4]) && seis[2].equals(seis[6]))) {
-
-
-                //TODO: Praegu on see getsümboli asi vale. Tahaks leida, mis sümbol siis võitis ja sellele mängija punkt juurde
-                if (seis[0].equals(mängija1.getSümbol())) {
-                    mängija1.lisaPunkt();
-                    return mängija1;
-                }
-
-                if (seis[1].equals(mängija2.getSümbol())) {
-                    mängija2.lisaPunkt();
-                    return mängija2;
-                }
+            //kontrollime üle read ja veerud
+            if ((seis[3*i].equals(seis[3*i + 1]) && seis[3*i].equals(seis[3*i + 2]))
+                    || (seis[i].equals(seis[i + 3]) && seis[i].equals(seis[i + 6]))) {
+                //kui keegi võitis, siis läheme võit meetodisse ja tagastame true
+                võit(seis[i]);
+                return true;
             }
         }
-        return null;
+        //kontrollime diagonaalid
+        if ((seis[0].equals(seis[4]) && seis[0].equals(seis[8]))
+                || (seis[2].equals(seis[4]) && seis[2].equals(seis[6]))) {
+
+            //kui keegi võitis, siis läheme võit meetodisse ja tagastame true
+            võit(seis[4]);
+            return true;
+        }
+
+        //kontrollime, kas kõik käigud on tehtud
+        //kui enne seda ei tulnud võitu, siis järelikult on tegemist viigiga
+        boolean viik = true;
+        for (String sümb : seis) {
+            //vaatame iga ruudu kohta, kas see on veel "tühi" ja kui on, siis ei saa veel viik olla
+            if (!sümb.equals("X") && !sümb.equals("O")) {
+                viik = false;
+                break;
+            }
+        }
+        if (viik){
+            //kuvame seisu mängulaual
+            kuvaMängulaud(seis);
+            //väljastame teated mängu lõpu kohta
+            System.out.println("MÄNG LÄBI!");
+            System.out.println("Mäng jäi viiki");
+            return true;
+        }
+        //kui ükski lõputingimustest veel ei kehti, siis tagastame false
+        return false;
+    }
+
+    private void võit(String sümbol) {
+        //juhul, kui üks mängija võitis
+        if (sümbol.equals(mängija1.getSümbol())){
+            //kui võitis esimene mängija
+            mängija1.lisaPunkt();//lisame talle tabelisse punkti
+
+            //kuvame seisu mängulaual
+            kuvaMängulaud(seis);
+            //väljastame teated mängu lõpu kohta
+            System.out.println("MÄNG LÄBI!");
+            System.out.println("Võitis " + mängija1.getNimi());
+        }else if (sümbol.equals(mängija2.getSümbol())){
+            //kui võitis teine mängija
+            mängija2.lisaPunkt();
+
+            //kuvame seisu mängulaual
+            kuvaMängulaud(seis);
+            //väljastame teated mängu lõpu kohta
+            System.out.println("MÄNG LÄBI!");
+            System.out.println("Võitis " + mängija2.getNimi());
+        }else
+            System.out.println("See ei tohiks juhtuda!");//TODO troubleshootimiseks, kustutada
     }
 }

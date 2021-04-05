@@ -4,10 +4,12 @@ public class Mängija {
     private String sümbol;
     private int punktid = 0;
 
+    //konstruktor
     public Mängija(String nimi, String sümbol) {
         this.nimi = nimi;
     }
 
+    //getterid
     public String getNimi() {
         return nimi;
     }
@@ -20,6 +22,7 @@ public class Mängija {
         return punktid;
     }
 
+    //setterid
     public void setNimi(String nimi) {
         this.nimi = nimi;
     }
