@@ -1,6 +1,5 @@
 import javax.swing.*;
-import java.util.Random;
-// probs on veel mingeid probleeme, pole eriti testinud veel ja optimeerida saab ka veel korralikult ma arvan
+
 public class Mäng {
     String[] seis = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9"};
     Mängija mängija1 = new Mängija("", "X");
@@ -11,7 +10,6 @@ public class Mäng {
         int[] tulemused = {0, 0};
 
         //küsime kasutajate käest jOptionPane kasutades nimed
-        // TODO muutsin sõnumikastist "sisesta nimi" messagekasti, sest juba esimesel käivitamisel see segas mind, et kustutama pidi
         String nimi1 = JOptionPane.showInputDialog(null, "Mängime mängu trips-traps-trull. \nSisesta 1. mängija nimi:", "");
         String nimi2 = JOptionPane.showInputDialog(null, "Mängime mängu trips-traps-trull. \nSisesta 2. mängija nimi:", "");
 
@@ -71,7 +69,7 @@ public class Mäng {
             break;
         }
         else
-            System.out.println("Sinna ruutu ei saa, proovi uuesti!");//TODO see error ka äkki JOptionPane-iga?
+            System.out.println("Sinna ruutu ei saa, proovi uuesti!");
 
         }
     }
@@ -144,9 +142,8 @@ public class Mäng {
             //kuvame seisu mängulaual
             kuvaMängulaud(seis);
             //väljastame teated mängu lõpu kohta
-            System.out.println("MÄNG LÄBI!");
+            System.out.println("\nMÄNG LÄBI!");
             System.out.println("Võitis " + mängija2.getNimi());
-        }else
-            System.out.println("See ei tohiks juhtuda!");//TODO troubleshootimiseks, kustutada
+        }
     }
 }

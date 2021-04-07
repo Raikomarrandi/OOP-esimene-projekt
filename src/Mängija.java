@@ -35,15 +35,6 @@ public class Mängija {
         this.punktid = punktid;
     }
 
-
-    @Override
-    public String toString() {
-        return "Mängija{" +
-                "nimi='" + nimi + '\'' +
-                ", punktid=" + punktid +
-                '}';
-    }
-
     public void lisaPunkt() {
         punktid++;
     }
